@@ -9,17 +9,19 @@
 if [ $# -eq 0 ]; then
   exit "please specify a filename argument for our output"
 fi
-if [ -d "src" ]; then
-  mkdir src
+if [ ! -d "src" ]; then
+  mkdir "src"
 fi
+
+cd "src"
 
 shopt -s nullglob # for our files array
 
-if [[ `find $PWD | grep ".zip$" | wc -l` -eq 0 ]]; then
+if [[ `find "$PWD" | grep ".zip$" | wc -l` -eq 0 ]]; then
   print " -- downloading:"
-  wget -r --no-parent -nH --cut-dirs=1 --reject "index.html*" ftp://ftp2.census.gov/geo/tiger/TIGER2016/ROADS/
+  wget -r --continue --no-parent -nH --cut-dirs=1 --reject "index.html*" ftp://ftp2.census.gov/geo/tiger/TIGER2016/ROADS/
 fi
-if [[ `find $PWD | grep ".shp$" | wc -l` -eq 0 ]]; then
+if [[ `find "$PWD" | grep ".shp$" | wc -l` -eq 0 ]]; then
   print " -- unpacking"
   for f in `ls -1 *.zip`; do
     7za x $f
