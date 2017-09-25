@@ -36,7 +36,7 @@ echo " -- merging and subsetting input data:"
 ogr2ogr -f "ESRI Shapefile" $1 "${files[0]}"
 
 for fn in "${files[@]:1}"; do # slice to end of array (skipping 0)
-  ogr2ogr -f "ESRI Shapefile" -clipsrc "/global_workspace/ebird_number_crunching/ebird_reference_dataset_erd/erd/central_flyway.shp" -append -update $1 $fn
+  ogr2ogr -f "ESRI Shapefile" -clipsrc "/global_workspace/ebird_number_crunching/ebird_reference_dataset_erd/erd/central_flyway.shp" -skipfailures -append -update $1 $fn
 done
 
  mv "${1/.shp/.*}" "../"
