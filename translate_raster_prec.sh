@@ -8,6 +8,15 @@
 # It will ALWAYS drop the precision of your rasters, sometimes dramatically.
 #
 
+if [ $# -eq 0 ]; then
+  PROCESS_DIR=`ls -1 $PWD | grep -E ".tif$|.img|.bil"`
+fi
+if [ -d $1 ]; then
+  PROCESS_DIR=`ls -1 $1 | grep -E ".tif$|.img|.bil"`
+else # if this isn't a directory, assume the user passed a path with wildcards with ls comprehension
+  PROCESS_FLAGS=`ls -1 $1`
+fi
+
 for f in `ls -1 *_30m.tif`; do
   MAX=`gdalinfo -stats $f | grep _MAX | awk '{ gsub("    STATISTICS_MAXIMUM=",""); print }'`
   MIN=`gdalinfo -stats $f | grep _MIN | awk '{ gsub("    STATISTICS_MINIMUM=",""); print }'`
