@@ -39,6 +39,9 @@ for fn in "${files[@]:1}"; do # slice to end of array (skipping 0)
   ogr2ogr -f "ESRI Shapefile" -clipsrc "/global_workspace/ebird_number_crunching/ebird_reference_dataset_erd/erd/central_flyway.shp" -skipfailures -append -update $1 $fn
 done
 
- mv "${1/.shp/.*}" "../"
+cd src;
+mv "${1/.shp/.*}" "../"
+rm -rf *.shp *.shx *.prj *.xml
+cd ..
 
 echo " -- done"
