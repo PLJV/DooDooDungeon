@@ -1,12 +1,18 @@
 na.omit.list <- function(y) { return(y[!sapply(y, function(x) all(is.na(x)))]) }
+
+f <- readLines("to_fetch.dat")
+toFetch <- unlist(strsplit(f,split="DOF_"))
+toFetch <- toFetch[grepl(toFetch,pattern="zip")]
+toFetch <- unlist(strsplit(toFetch,split="[.]"))
+toFetch <- as.numeric(toFetch[!grepl(toFetch,pattern="zip")])
+
 # determine which FAA file from index.html is the most recent and download it.
 if(!file.exists("faa_obs.zip")){
-  f <- readLines("to_fetch.dat")
-  toFetch <- unlist(strsplit(f,split="DOF_"))
-  toFetch <- toFetch[grepl(toFetch,pattern="zip")]
-  toFetch <- unlist(strsplit(toFetch,split="[.]"))
-  toFetch <- as.numeric(toFetch[!grepl(toFetch,pattern="zip")])
-  download.file(f[which(toFetch == max(toFetch))],destfile="faa_obs.zip")
+  download.file(
+    f[which(toFetch == max(toFetch))],
+    destfile="faa_obs.zip", 
+    quiet=T
+  )
 }
 cat(" -- decompressing\n")
 success <- suppressMessages(unzip("faa_obs.zip"))

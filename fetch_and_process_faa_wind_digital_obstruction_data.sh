@@ -13,3 +13,6 @@ cat index.html | grep zip | grep "a href" | awk '{ print $2 }' | cut -d '"' -f2 
 Rscript $BASH_DIR"/fetch_and_process_faa_wind_digital_obstruction_data.R"
 
 rm -rf *DAT *EXE *exe
+
+7za a `ls -1 wind_turbines_*.shp | awk '{ gsub(".shp",".zip"); print }'` wind_turbines_*
+#rm -rf `ls -1 wind_turbines_* | grep -v "zip"`
