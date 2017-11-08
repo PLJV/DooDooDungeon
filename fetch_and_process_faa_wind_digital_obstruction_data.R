@@ -8,6 +8,7 @@ toFetch <- as.numeric(toFetch[!grepl(toFetch,pattern="zip")])
 
 # determine which FAA file from index.html is the most recent and download it.
 if(!file.exists("faa_obs.zip")){
+  cat(" -- downloading FAA data\n")
   download.file(
     f[which(toFetch == max(toFetch))],
     destfile="faa_obs.zip", 
