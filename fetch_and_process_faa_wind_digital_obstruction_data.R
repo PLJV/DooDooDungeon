@@ -20,8 +20,7 @@ if ( !length(success) ){
   stop("encountered a problem decompressing faa_obs.zip file!")
 }
 toDelete <- list.files(pattern="Dat$|dat$")
-  toDelete <- toDelete[!grepl(toDelete,pattern="DOF")]
-    suppressMessages(unlink(toDelete))
+suppressMessages(unlink(toDelete[!grepl(toDelete,pattern="DOF")]))
 f <- readLines("DOF.DAT",skip=4)
 cat(" -- parsing FAA obstructions for windmills: ")
 turbines <- lapply(
