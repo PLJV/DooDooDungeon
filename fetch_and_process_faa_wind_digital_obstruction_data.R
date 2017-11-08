@@ -1,5 +1,4 @@
 na.omit.list <- function(y) { return(y[!sapply(y, function(x) all(is.na(x)))]) }
-
 # determine which FAA file from index.html is the most recent and download it.
 if(!file.exists("faa_obs.zip")){
   f <- readLines("to_fetch.dat")
@@ -9,21 +8,16 @@ if(!file.exists("faa_obs.zip")){
   toFetch <- as.numeric(toFetch[!grepl(toFetch,pattern="zip")])
   download.file(f[which(toFetch == max(toFetch))],destfile="faa_obs.zip")
 }
-
 cat(" -- decompressing\n")
 success <- suppressMessages(unzip("faa_obs.zip"))
 if ( !length(success) ){
   stop("encountered a problem decompressing faa_obs.zip file!")
 }
-
 toDelete <- list.files(pattern="Dat$|dat$")
   toDelete <- toDelete[!grepl(toDelete,pattern="DOF")]
     suppressMessages(unlink(toDelete))
-
 f <- readLines("DOF.DAT",skip=4)
-
 cat(" -- parsing FAA obstructions for windmills: ")
-
 turbines <- lapply(
   X=1:length(f),
   FUN=function(x){
@@ -56,16 +50,18 @@ turbines <- lapply(
       return(NA)
     }
   })  
-
-turbines <- plyr::ldply(na.omit.list(turbines), rbind)
-
+# merge our lapply into a single table
+turbines <- plyr::ldply(
+    na.omit.list(turbines), 
+    rbind
+  )
+# format as SpatialPointsDataFrame
 pts <- sp::SpatialPointsDataFrame(
     coords=data.frame(x=turbines$longitude,y=turbines$latitude), 
     data=data.frame(ors=turbines$ors,year=turbines$year)
   )
-  
+# write shapefile to disk
 raster::projection(pts) <- raster::projection("+init=epsg:4326")
-
 rgdal::writeOGR(
     pts, 
     ".", 
