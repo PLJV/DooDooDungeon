@@ -56,7 +56,7 @@ echo -n " -- processing:"
 # the first split should have a lurking header at line n=1
 header_is_present ${split_files[0]} "chop"
 add_header_to_split_files $split_files $header
- 
+
 # compress everything for the user
 rm -rf echo $1 | awk '{ gsub(".txt",""); print }'`"_processed.zip"
 7za a `echo $1 | awk '{ gsub(".txt",""); print }'`"_processed.zip" ${split_files[@]}
