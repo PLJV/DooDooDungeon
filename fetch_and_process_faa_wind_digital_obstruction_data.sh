@@ -7,9 +7,11 @@ rm -rf to_fetch.dat;
 
 echo "-- scraping FAA website"
 curl --silent --output index.html\
-  https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dof/ >> index.html >/dev/null 2>&1
+  https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dof/\
+  >> index.html >/dev/null 2>&1
 
-cat index.html | grep zip | grep "a href" | awk '{ print $2 }' | cut -d '"' -f2 >> to_fetch.dat
+cat index.html | grep zip | grep "a href" | awk '{ print $2 }' | cut -d '"'\
+  -f2 >> to_fetch.dat
 
 Rscript $BASH_DIR"/fetch_and_process_faa_wind_digital_obstruction_data.R"
 

@@ -19,7 +19,8 @@ shopt -s nullglob # for our files array
 
 if [[ `find "$PWD" | grep ".zip$" | wc -l` -eq 0 ]]; then
   print " -- downloading:"
-  wget -r --continue --no-parent -nH --cut-dirs=1 --reject "index.html*" ftp://ftp2.census.gov/geo/tiger/TIGER2016/ROADS/
+  wget -r --continue --no-parent -nH --cut-dirs=1 --reject\ 
+    "index.html*" ftp://ftp2.census.gov/geo/tiger/TIGER2016/ROADS/
 fi
 if [[ `find "$PWD" | grep ".shp$" | wc -l` -eq 0 ]]; then
   print " -- unpacking"
@@ -36,7 +37,9 @@ echo " -- merging and subsetting input data:"
 ogr2ogr -f "ESRI Shapefile" $1 "${files[0]}"
 
 for fn in "${files[@]:1}"; do # slice to end of array (skipping 0)
-  ogr2ogr -f "ESRI Shapefile" -clipsrc "/global_workspace/ebird_number_crunching/ebird_reference_dataset_erd/erd/central_flyway.shp" -skipfailures -append -update $1 $fn
+  ogr2ogr -f "ESRI Shapefile" -clipsrc\
+    "/global_workspace/ebird_number_crunching/ebird_reference_dataset_erd/erd/central_flyway.shp"\
+    -skipfailures -append -update $1 $fn
 done
 
 cd src;
