@@ -1,28 +1,29 @@
 #!/bin/bash
-
-BASH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-rm -rf index.html;
-rm -rf to_fetch.dat;
-
-echo "-- scraping FAA website"
-curl --silent --output index.html\
-  https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dof/\
-  >> index.html >/dev/null 2>&1
-
-cat index.html | grep zip | grep "a href" | awk '{ print $2 }' | cut -d '"'\
-  -f2 >> to_fetch.dat
-
-Rscript $BASH_DIR"/fetch_and_process_faa_wind_digital_obstruction_data.R"
-
-echo "-- cleaning-up, compressing, and committing"
-rm -rf *DAT *EXE *exe index.html *.dat DOF*.zip *.txt;
-
-7za a `ls -1 wind_turbines_*.shp | \
-  awk '{ gsub(".shp",".zip"); print }'` wind_turbines_* >/dev/null 2>&1
-
-rm -rf `ls -1 wind_turbines_* | grep -v "zip"`;
-
-if [ -d /gis_data/Wind/Deliverables/ ]; then
-  mv wind_turbines_*.zip /gis_data/Wind/Deliverables/
+# when run from cron, these shell built-ins are sometimes neglected
+export PATH="$PATH:/usr/local/sbin:/usr/sbin:/sbin:/usr/bin:/bin"
+export TERM=linux
+# default runtime arguments
+PROJECT_DIR="/tmp"
+DELIVERABLES_DIR="/gis_data/Wind/Deliverables/"
+# make sure we are using the latest version of our detector
+echo " -- BUILDING Latest Detector from Github"
+cd /home/ktaylora/Projects/PlayaWind*; git pull
+cd /home/ktaylora/Projects/Beatbox; git pull
+/opt/anaconda/anaconda2/bin/pip install --upgrade /home/ktaylora/Projects/Beatbox
+/opt/anaconda/anaconda2/bin/pip install --upgrade /home/ktaylora/Projects/PlayaWind*
+# drop-in to our project dir and make a mess of things
+echo " -- Setting-up Project Workspace"
+cp -r /home/ktaylora/Projects/PlayaWind*/geometries $PROJECT_DIR;
+cd $PROJECT_DIR;
+echo " -- RUNNING"
+# here is the actual script-runner call for the knockout app
+if ! /opt/anaconda/anaconda2/bin/python /home/ktaylora/Projects/PlayaWind*/runner.py; then
+  echo " -- ERROR : SCRIPT RUN FAILURE (EXIT)"
+  exit
 fi
+# move deliverables to their final home on gis_data
+echo " -- Moving Deliverbales to Products Directory"
+if [ -d $DELIVERABLES_DIR ]; then
+  mv exports/*.zip $DELIVERABLES_DIR
+fi
+
